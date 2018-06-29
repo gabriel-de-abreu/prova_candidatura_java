@@ -5,6 +5,7 @@
  */
 package com.example.demo.project;
 
+import com.example.demo.Utils.Validate;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
@@ -51,6 +52,9 @@ public class ProjectRestController {
     
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> post(@RequestBody ProjectDTO input) {
+        if(!Validate.validateName(input.getName())){
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(projectRepository.save(
                 new Project(input.getName())
         ));

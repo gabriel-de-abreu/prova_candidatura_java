@@ -5,6 +5,7 @@
  */
 package com.example.demo.Employee;
 
+import com.example.demo.Utils.Validate;
 import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,9 @@ public class EmployeeRestController {
 
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Employee> post(@RequestBody EmployeeDTO input) {
+        if (!Validate.validateName(input.getName())) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity
                 .ok(
                         this.employeeRepository.save(
