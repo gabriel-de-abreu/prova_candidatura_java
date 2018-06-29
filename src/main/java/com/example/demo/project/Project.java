@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.SequenceGenerator;
 
 /**
  *
@@ -24,12 +25,15 @@ public class Project implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "seq_project", sequenceName = "seq_project",
+            initialValue = 1)
     private Long id;
     @Column(unique = true)
     private String name;
     @ManyToMany(mappedBy = "projects")
     private Set<Employee> employees;
+
     public Project() {
     }
 
@@ -47,8 +51,8 @@ public class Project implements Serializable {
 
     public String getName() {
         return name;
-    }  
-    
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
