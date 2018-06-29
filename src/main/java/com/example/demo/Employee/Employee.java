@@ -5,11 +5,18 @@
  */
 package com.example.demo.Employee;
 
+import com.example.demo.project.Project;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 
 /**
  *
@@ -24,16 +31,22 @@ public class Employee implements Serializable {
     private Long id;
     private String name;
     private Float salary;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "employee_project",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id"))
+    private Set<Project> projects;
 
     public Employee(String name, Float salary) {
         this.name = name;
         this.salary = salary;
+        projects = new HashSet<>();
     }
 
     public Employee() {
+        projects = new HashSet<>();
     }
-    
-    
+
     public Long getId() {
         return id;
     }
@@ -56,6 +69,18 @@ public class Employee implements Serializable {
 
     public void setSalary(Float salary) {
         this.salary = salary;
+    }
+
+    public void addProject(Project project) {
+        this.projects.add(project);
+    }
+
+    public void removeProject(Project project) {
+        this.projects.remove(project);
+    }
+
+    public Set<Project> getProjects() {
+        return projects;
     }
     
     @Override
@@ -82,5 +107,5 @@ public class Employee implements Serializable {
     public String toString() {
         return "com.example.demo.Employee[ id=" + id + " ]";
     }
-    
+
 }

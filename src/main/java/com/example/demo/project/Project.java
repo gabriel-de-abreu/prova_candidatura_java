@@ -5,11 +5,14 @@
  */
 package com.example.demo.project;
 
+import com.example.demo.Employee.Employee;
 import java.io.Serializable;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 
 /**
  *
@@ -23,7 +26,8 @@ public class Project implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
-
+    @ManyToMany(mappedBy = "projects")
+    private Set<Employee> employees;
     public Project() {
     }
 
@@ -41,9 +45,8 @@ public class Project implements Serializable {
 
     public String getName() {
         return name;
-    }
+    }  
     
-
     @Override
     public int hashCode() {
         int hash = 0;
