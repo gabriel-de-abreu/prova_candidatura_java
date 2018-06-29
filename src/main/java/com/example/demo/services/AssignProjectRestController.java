@@ -22,11 +22,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
  */
 @RestController
 @RequestMapping(path="/assign", produces = APPLICATION_JSON_VALUE)
-public class AssignProject {
+public class AssignProjectRestController {
     private EmployeeRepository employeeRepository;
     private ProjectRepository projectRepository;
 
-    public AssignProject(EmployeeRepository employeeRepository, ProjectRepository projectRepository) {
+    public AssignProjectRestController(EmployeeRepository employeeRepository, ProjectRepository projectRepository) {
         this.employeeRepository = employeeRepository;
         this.projectRepository = projectRepository;
     }

@@ -8,6 +8,7 @@ package com.example.demo.project;
 import com.example.demo.Employee.Employee;
 import java.io.Serializable;
 import java.util.Set;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,6 +26,7 @@ public class Project implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(unique = true)
     private String name;
     @ManyToMany(mappedBy = "projects")
     private Set<Employee> employees;
