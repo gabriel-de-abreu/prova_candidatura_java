@@ -11,8 +11,7 @@ package com.example.demo.services;
  */
 public class AssignDTO {
     private Long projId;
-    private Long empId;
-
+    
     public AssignDTO() {
     }
 
@@ -22,14 +21,5 @@ public class AssignDTO {
 
     public void setProjId(Long projId) {
         this.projId = projId;
-    }
-
-    public Long getEmpId() {
-        return empId;
-    }
-
-    public void setEmpId(Long empId) {
-        this.empId = empId;
-    }
-    
+    }    
 }
