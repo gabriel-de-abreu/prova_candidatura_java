@@ -16,12 +16,16 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import javax.annotation.Priority;
 import org.aspectj.util.LangUtil;
 
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.json.JsonParserFactory;
@@ -39,6 +43,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DemoApplicationTests {
 
     @Autowired
@@ -52,6 +57,7 @@ public class DemoApplicationTests {
     private final String urlEmployee = "/employees";
     private final String urlProject = "/projects";
     private final String urlAssign = "/assign";
+    private final String urlAssigned = "/assignedEmployees";
 
     private MockMvc mockMvc;
 
@@ -78,9 +84,40 @@ public class DemoApplicationTests {
 
     //Retorna todos os funcionários com projeto
     @Test
-    public void EmployeeGetAllAssigned() throws Exception {
-        mockMvc.perform(get(urlEmployee)).
-                andExpect(status().isOk());
+    public void A1_EmployeeGetAllAssigned() throws Exception {
+        Employee pedro = new Employee("Pedro", 2000f);
+        Long idPedro = Integer.toUnsignedLong(
+                (int) getParser().parseMap(mockMvc.perform(post(urlEmployee).
+                        content(json(pedro)).
+                        contentType(contentType)).andReturn().getResponse().
+                        getContentAsString()).get("id"));
+        Employee fernando = new Employee("Fernando", 1500f);
+
+        Long idFernando = Integer.toUnsignedLong(
+                (int) getParser().parseMap(mockMvc.perform(post(urlEmployee).
+                        content(json(fernando)).
+                        contentType(contentType)).andReturn().getResponse().
+                        getContentAsString()).get("id"));
+        Project projA = new Project("Projeto A");
+        Long idProj = Integer.toUnsignedLong(
+                (int) getParser().parseMap(mockMvc.perform(post(urlProject).
+                        content(json(projA)).
+                        contentType(contentType)).andReturn().getResponse().
+                        getContentAsString()).get("id"));
+        AssignDTO dto = new AssignDTO();
+        dto.setProjId(idProj);
+
+        mockMvc.perform(post(urlAssign + "/" + idPedro).
+                content(json(dto)).
+                contentType(contentType));
+        MvcResult queryResult = mockMvc.perform(get(urlAssigned)).andReturn();
+        int total
+                = getParser().parseList(queryResult.getResponse().getContentAsString()).size();
+        Map row = (Map) getParser().parseList(queryResult.getResponse().getContentAsString()).get(0);
+        Long idEmp = Integer.toUnsignedLong((int) row.get("id"));
+        boolean result = ((Objects.equals(idEmp, idPedro)) && (total==1));
+        assertTrue(result);
+
     }
 
     //Adiciona um Employee ao banco de dados
@@ -146,13 +183,13 @@ public class DemoApplicationTests {
                             contentType(contentType)).andReturn().getResponse()
                             .getContentAsString()).get("id")));
         }
-        Employee emp = new Employee("José", 3000f);
+        Employee emp = new Employee("Silva", 3000f);
         MvcResult result = mockMvc.perform(post(urlEmployee).
                 content(json(emp)).
                 contentType(contentType)).andReturn();
         int idEmp = (Integer) getParser().parseMap(result.getResponse()
                 .getContentAsString()).get("id");
-        AssignDTO dto= new AssignDTO();
+        AssignDTO dto = new AssignDTO();
         dto.setProjId(ids.get(0));
         mockMvc.perform(post(urlAssign + "/" + idEmp).
                 content(json(dto)).
@@ -161,7 +198,7 @@ public class DemoApplicationTests {
         mockMvc.perform(post(urlAssign + "/" + idEmp).
                 content(json(dto)).
                 contentType(contentType)).andExpect(status().isOk());
-        
+
     }
 
     //Tenta adicionar 3 projetos para o mesmo employee
@@ -183,7 +220,7 @@ public class DemoApplicationTests {
                             contentType(contentType)).andReturn().getResponse()
                             .getContentAsString()).get("id")));
         }
-        Employee emp = new Employee("José", 3000f);
+        Employee emp = new Employee("Felipe", 3000f);
         MvcResult result = mockMvc.perform(post(urlEmployee).
                 content(json(emp)).
                 contentType(contentType)).andReturn();
