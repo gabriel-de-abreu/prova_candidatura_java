@@ -87,15 +87,10 @@ public class DemoApplicationTests {
     public void A1_EmployeeGetAllAssigned() throws Exception {
         Long idPedro = basicInsertEmployee("Pedro", 2000f);
         Long idProj = basicInsertProject("Projeto A");
-        AssignDTO dto = new AssignDTO();
-        dto.setProjId(idProj);
-
-        mockMvc.perform(post(urlAssign + "/" + idPedro).
-                content(json(dto)).
-                contentType(contentType));
+        basicAssign(idPedro, idProj);
         MvcResult queryResult = mockMvc.perform(get(urlAssigned)).andReturn();
-        int total
-                = getParser().parseList(queryResult.getResponse().getContentAsString()).size();
+        int total = getParser().parseList(queryResult.getResponse().
+                getContentAsString()).size();
         Map row = (Map) getParser().parseList(queryResult.getResponse().getContentAsString()).get(0);
         Long idEmp = Integer.toUnsignedLong((int) row.get("id"));
         boolean result = ((Objects.equals(idEmp, idPedro)) && (total == 1));
@@ -141,13 +136,9 @@ public class DemoApplicationTests {
     public void assign2ProjectToEmp() throws Exception {
         Long idProj3 = basicInsertProject("Projeto3");
         Long idProj4 = basicInsertProject("Projeto4");
-
         Long idEmp = basicInsertEmployee("Silva", 4000f);
+        basicAssign(idEmp, idProj3);
         AssignDTO dto = new AssignDTO();
-        dto.setProjId(idProj3);
-        mockMvc.perform(post(urlAssign + "/" + idEmp).
-                content(json(dto)).
-                contentType(contentType));
         dto.setProjId(idProj4);
         mockMvc.perform(post(urlAssign + "/" + idEmp).
                 content(json(dto)).
@@ -163,15 +154,9 @@ public class DemoApplicationTests {
         Long idProj7 = basicInsertProject("Projeto7");
 
         Long idEmp = basicInsertEmployee("Felipe", 3000f);
+        basicAssign(idEmp, idProj5);
+        basicAssign(idEmp, idProj6);
         AssignDTO dto = new AssignDTO();
-        dto.setProjId(idProj5);
-        mockMvc.perform(post(urlAssign + "/" + idEmp).
-                content(json(dto)).
-                contentType(contentType));
-        dto.setProjId(idProj6);
-        mockMvc.perform(post(urlAssign + "/" + idEmp).
-                content(json(dto)).
-                contentType(contentType));
         dto.setProjId(idProj7);
         mockMvc.perform(post(urlAssign + "/" + idEmp).
                 content(json(dto)).
@@ -180,6 +165,14 @@ public class DemoApplicationTests {
     }
 
     //Metodos para inserção simples
+    public void basicAssign(Long idEmp, Long idProj) throws Exception {
+        AssignDTO dto = new AssignDTO();
+        dto.setProjId(idProj);
+        mockMvc.perform(post(urlAssign + "/" + idEmp).
+                content(json(dto)).
+                contentType(contentType));
+    }
+
     public Long basicInsertEmployee(String name, Float salary) throws Exception {
         Employee emp = new Employee(name, salary);
         MvcResult result = mockMvc.perform(post(urlEmployee).
