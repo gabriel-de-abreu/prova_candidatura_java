@@ -53,9 +53,17 @@ public class ProjectRestController {
         return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> put(@PathVariable String id, @RequestBody Object input) {
-        return null;
+    @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> put(@PathVariable Long id, @RequestBody ProjectDTO input) {
+        logRepository.save((new Log("Updating project with id: " + id + " "
+                + "set name:" + input.getName(),
+                new Date())));
+        Project proj = projectRepository.findOne(id);
+        if (proj == null) {
+            return ResponseEntity.notFound().build();
+        }
+        proj.setName(input.getName());
+        return ResponseEntity.ok(projectRepository.save(proj));
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
