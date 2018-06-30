@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -70,4 +71,16 @@ public class EmployeeRestController {
                         )
                 );
     }
+    @RequestMapping(method=DELETE,value="/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id){
+        logRepository.save(new Log("Deleting employee with: "+id,
+                new Date()));
+        Employee emp = employeeRepository.findOne(id);
+        if(emp==null){
+            return ResponseEntity.notFound().build();
+        }
+        employeeRepository.delete(id);
+        return ResponseEntity.ok("Removed");
+    }
+    
 }
