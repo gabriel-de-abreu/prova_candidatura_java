@@ -85,13 +85,8 @@ public class DemoApplicationTests {
     //Retorna todos os funcionários com projeto
     @Test
     public void A1_EmployeeGetAllAssigned() throws Exception {
-        Long idPedro =basicInsertEmployee("Pedro", 2000f);
-        Project projA = new Project("Projeto A");
-        Long idProj = Integer.toUnsignedLong(
-                (int) getParser().parseMap(mockMvc.perform(post(urlProject).
-                        content(json(projA)).
-                        contentType(contentType)).andReturn().getResponse().
-                        getContentAsString()).get("id"));
+        Long idPedro = basicInsertEmployee("Pedro", 2000f);
+        Long idProj = basicInsertProject("Projeto A");
         AssignDTO dto = new AssignDTO();
         dto.setProjId(idProj);
 
@@ -131,15 +126,8 @@ public class DemoApplicationTests {
     //Adiciona um projeto para um funcionário
     @Test
     public void assignProjectToEmp() throws Exception {
-        Long idEmp= basicInsertEmployee("José", 3000f);
-        Project proj= new Project("Projeto2");
-        MvcResult projectResult = mockMvc.perform(post(urlProject).
-                content(json(proj)).
-                contentType(contentType)).andReturn();
-        Long idProject = Integer.
-                toUnsignedLong((int) getParser()
-                        .parseMap(projectResult.getResponse()
-                                .getContentAsString()).get("id"));
+        Long idEmp = basicInsertEmployee("José", 3000f);
+        Long idProject = basicInsertProject("Projeto2");
         AssignDTO dto = new AssignDTO();
         dto.setProjId(idProject);
         mockMvc.perform(post(urlAssign + "/" + idEmp).
@@ -151,27 +139,16 @@ public class DemoApplicationTests {
     //Adiciona dois projetos para o mesmo funcionário
     @Test
     public void assign2ProjectToEmp() throws Exception {
-        Project proj1 = new Project("Projeto3");
-        Project proj2 = new Project("Projeto4");
-        ArrayList<Project> projects = new ArrayList<>();
-        projects.add(proj1);
-        projects.add(proj2);
-        ArrayList<Long> ids = new ArrayList<>();
+        Long idProj3 = basicInsertProject("Projeto3");
+        Long idProj4 = basicInsertProject("Projeto4");
 
-        for (Project project : projects) {
-            ids.add(Integer.toUnsignedLong((Integer) getParser().parseMap(
-                    mockMvc.perform(post(urlProject).
-                            content(json(project)).
-                            contentType(contentType)).andReturn().getResponse()
-                            .getContentAsString()).get("id")));
-        }
-        Long idEmp= basicInsertEmployee("Silva", 4000f);
+        Long idEmp = basicInsertEmployee("Silva", 4000f);
         AssignDTO dto = new AssignDTO();
-        dto.setProjId(ids.get(0));
+        dto.setProjId(idProj3);
         mockMvc.perform(post(urlAssign + "/" + idEmp).
                 content(json(dto)).
                 contentType(contentType));
-        dto.setProjId(ids.get(1));
+        dto.setProjId(idProj4);
         mockMvc.perform(post(urlAssign + "/" + idEmp).
                 content(json(dto)).
                 contentType(contentType)).andExpect(status().isOk());
@@ -181,31 +158,21 @@ public class DemoApplicationTests {
     //Tenta adicionar 3 projetos para o mesmo employee
     @Test
     public void assign3ProjectsToEmp() throws Exception {
-        Project proj1 = new Project("Projeto5");
-        Project proj2 = new Project("Projeto6");
-        Project proj3 = new Project("Projeto7");
-        ArrayList<Long> ids = new ArrayList<>();
+        Long idProj5 = basicInsertProject("Projeto5");
+        Long idProj6 = basicInsertProject("Projeto6");
+        Long idProj7 = basicInsertProject("Projeto7");
 
-        ArrayList<Project> projects = new ArrayList<>();
-        projects.add(proj1);
-        projects.add(proj2);
-        projects.add(proj3);
-        for (Project project : projects) {
-            ids.add(Integer.toUnsignedLong((Integer) getParser().parseMap(
-                    mockMvc.perform(post(urlProject).
-                            content(json(project)).
-                            contentType(contentType)).andReturn().getResponse()
-                            .getContentAsString()).get("id")));
-        }
         Long idEmp = basicInsertEmployee("Felipe", 3000f);
         AssignDTO dto = new AssignDTO();
-        for (int i = 0; i < 2; i++) {
-            dto.setProjId(ids.get(i));
-            mockMvc.perform(post(urlAssign + "/" + idEmp).
-                    content(json(dto)).
-                    contentType(contentType));
-        }
-        dto.setProjId(ids.get(2));
+        dto.setProjId(idProj5);
+        mockMvc.perform(post(urlAssign + "/" + idEmp).
+                content(json(dto)).
+                contentType(contentType));
+        dto.setProjId(idProj6);
+        mockMvc.perform(post(urlAssign + "/" + idEmp).
+                content(json(dto)).
+                contentType(contentType));
+        dto.setProjId(idProj7);
         mockMvc.perform(post(urlAssign + "/" + idEmp).
                 content(json(dto)).
                 contentType(contentType)).andExpect(status().isBadRequest());
@@ -218,8 +185,19 @@ public class DemoApplicationTests {
         MvcResult result = mockMvc.perform(post(urlEmployee).
                 content(json(emp)).
                 contentType(contentType)).andReturn();
-        int idEmp = (Integer) getParser().parseMap(result.getResponse().getContentAsString()).get("id");
+        int idEmp = (Integer) getParser().parseMap(result.getResponse()
+                .getContentAsString()).get("id");
         return Integer.toUnsignedLong(idEmp);
+    }
+
+    public Long basicInsertProject(String name) throws Exception {
+        Project project = new Project(name);
+        MvcResult result = mockMvc.perform(post(urlProject).
+                content(json(project)).
+                contentType(contentType)).andReturn();
+        int idProj = (Integer) getParser().parseMap(result.getResponse()
+                .getContentAsString()).get("id");
+        return Integer.toUnsignedLong(idProj);
     }
 
     //Metodos auxiliares
