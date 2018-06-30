@@ -72,7 +72,7 @@ public class ProjectRestController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        logRepository.save(new Log("Deleting project with id: " + id,
+        logRepository.save(new Log("Deleted project with id: " + id,
                 new Date()));
         Project project = projectRepository.findOne(id);
         if (project == null) {

@@ -13,6 +13,7 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,6 +53,20 @@ public class EmployeeRestController {
         return ResponseEntity.notFound().build();
     }
 
+    @PutMapping(value="/{id}",consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> put(@PathVariable Long id, @RequestBody EmployeeDTO input) {
+        logRepository.save(new Log("Updated Employee with id: " + id
+                + " set Name: " + input.getName() + " set salary: " + input.getSalary(),
+                new Date()));
+        Employee emp = employeeRepository.findOne(id);
+        if (emp == null) {
+            return ResponseEntity.notFound().build();
+        }
+        emp.setName(input.getName());
+        emp.setSalary(input.getSalary());
+        return ResponseEntity.ok(employeeRepository.save(emp));
+    }
+
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Employee> post(@RequestBody EmployeeDTO input) {
         logRepository.save(new Log("Signed employee with name "
@@ -71,16 +86,17 @@ public class EmployeeRestController {
                         )
                 );
     }
-    @RequestMapping(method=DELETE,value="/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id){
-        logRepository.save(new Log("Deleting employee with: "+id,
+
+    @RequestMapping(method = DELETE, value = "/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        logRepository.save(new Log("Deleting employee with: " + id,
                 new Date()));
         Employee emp = employeeRepository.findOne(id);
-        if(emp==null){
+        if (emp == null) {
             return ResponseEntity.notFound().build();
         }
         employeeRepository.delete(id);
         return ResponseEntity.ok("Removed");
     }
-    
+
 }
